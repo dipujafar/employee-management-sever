@@ -10,6 +10,22 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const verifyToken = (req, res, next)=>{
+  if(!req.headers.authorization){
+    return res.status(401).send({message: "unauthorized access"});
+  };
+
+  const token = req.headers.authorization.split(' ')[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+    if(err){
+      return res.status(401).send({message: "unauthorized access"});
+    }
+    req.decoded = decoded;
+    next();
+  })
+};
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@jafardipu.hwlq4pv.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
