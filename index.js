@@ -44,6 +44,24 @@ async function run() {
 
     const serviceCollection = client.db("employee").collection("services");
     const reviewCollection = client.db("employee").collection("reviews");
+    const userCollection = client.db("employee").collection("users");
+
+
+    // hr related api
+    app.get('/users/hr/:email', verifyToken, async(req, res)=>{
+      const email = req.params.email;
+      if(email !== req.decoded.email){
+        return res.status(403).send({message: "forbidden"});
+      }
+      
+      const query = {email: email};
+      const user = await userCollection.findOne(query);
+      let hr = false;
+      if(user){
+        hr = user?.role === "HR";
+      };
+      res.send({hr});
+    })
 
     //jwt related apis
     app.post('/jwt', async(req,res)=>{
@@ -70,6 +88,11 @@ async function run() {
         //
       }
     });
+
+    app.get("/employees",verifyToken, async(req,res)=>{
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
