@@ -205,14 +205,18 @@ async function run() {
       const result = await workCollection.find(filter).toArray();
       res.send(result);
     });
-    app.post("/work", async(req, res)=>{
+    app.get("/allWork", verifyToken, verifyHr, async(req,res)=>{
+      const result = await workCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/work", verifyToken, async(req, res)=>{
       const workData = req.body;
       const result = await workCollection.insertOne(workData);
       res.send(result);
     });
 
     //payment related api
-    app.get("/payments", async(req,res)=>{
+    app.get("/payments", verifyToken, verifyHr, async(req,res)=>{
       const email = req.query.email;
       const filter = {email: email}
       const result = await paymentsCollection.find(filter).toArray();
