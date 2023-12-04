@@ -45,6 +45,7 @@ async function run() {
     const serviceCollection = client.db("employee").collection("services");
     const reviewCollection = client.db("employee").collection("reviews");
     const userCollection = client.db("employee").collection("users");
+    const workCollection = client.db("employee").collection("work");
 
     // admin middleware verification
     const verifyAdmin = async(req,res,next)=>{
@@ -189,10 +190,23 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          fired: true,
+          fired: true ,
         },
       };
       const result = await userCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    //work related apis
+    app.get("/work", verifyToken, async(req,res)=>{
+      const email = req.query.email;
+      const filter = {email: email}
+      const result = await workCollection.find(filter).toArray();
+      res.send(result);
+    });
+    app.post("/work", async(req, res)=>{
+      const workData = req.body;
+      const result = await workCollection.insertOne(workData);
       res.send(result);
     });
     // Send a ping to confirm a successful connection
