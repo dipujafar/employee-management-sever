@@ -46,6 +46,7 @@ async function run() {
     const reviewCollection = client.db("employee").collection("reviews");
     const userCollection = client.db("employee").collection("users");
     const workCollection = client.db("employee").collection("work");
+    const paymentsCollection = client.db("employee").collection("payments");
 
     // admin middleware verification
     const verifyAdmin = async(req,res,next)=>{
@@ -209,6 +210,14 @@ async function run() {
       const result = await workCollection.insertOne(workData);
       res.send(result);
     });
+
+    //payment related api
+    app.get("/payments", async(req,res)=>{
+      const email = req.query.email;
+      const filter = {email: email}
+      const result = await paymentsCollection.find(filter).toArray();
+      res.send(result);
+    })
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     // console.log(
